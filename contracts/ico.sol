@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 
 contract InvestorVault is ReentrancyGuard {
@@ -31,9 +31,10 @@ contract InvestorVault is ReentrancyGuard {
      */
     mapping(address => bool) admins;
     mapping(address => bool) authorizedStablecoins;
-    mapping(address => uin256) stablecoinBalances;
+    mapping(address => uint256) stablecoinBalances;
     IERC20 public gldkrm20;
     uint256 public rate = 12; // Conversion rate for buying gldkrm20 with Stablecoin
+    bool isActive;
     
 
     constructor(
@@ -43,7 +44,8 @@ contract InvestorVault is ReentrancyGuard {
         require(_rate > 0, "Rate must be greater than 0");
         gldkrm20 = _gldkrm20;
         rate = _rate;
-        admin[msg.sender] = true;
+        admins[msg.sender] = true;
+        isActive = true;
     }
 
 
@@ -56,10 +58,21 @@ contract InvestorVault is ReentrancyGuard {
     }
 
 
+    modifier onlyIfActivated(){
+        require(isActive == true, "Method is not active");
+        _;
+    }
+
+
     function addAdmin(address admin) external onlyAdmins{
         require(admin != address(0), "Invalid address");
         require(!admins[admin], "Already an admin");
         admins[admin] = true;
+    }
+
+
+    function setIsActivated(bool activate) external onlyAdmins{
+        isActive = activate;
     }
 
 
@@ -70,43 +83,42 @@ contract InvestorVault is ReentrancyGuard {
     }
 
 
-    function removeStablecoin(ierc20 _stablecoinAddress) external onlyAdmins{
+    function removeStablecoin(address _stablecoinAddress) external onlyAdmins{
         require(_stablecoinAddress != address(0), "Invalid address");
         require(stablecoinBalances[_stablecoinAddress] == 0, "Stablecoin balance should be zero");
         authorizedStablecoins[_stablecoinAddress] = false;
     }
 
-    function buy(uint256 _amount, ierc20 _stablecoinAddress) public nonReentrant {
+    function buy(uint256 _amount, address _stablecoinAddress) public nonReentrant onlyIfActivated{
         require(authorizedStablecoins[_stablecoinAddress] == true, "Stablecoin not registered");
         require(_stablecoinAddress != address(0), "Invalid address");
+        IERC20 stablecoin = IERC20(_stablecoinAddress);
 
-        uint256 userStablecoinBalance = _stablecoinAddress.balanceOf(msg.sender);
+        uint256 userStablecoinBalance = stablecoin.balanceOf(msg.sender);
         require(userStablecoinBalance >= _amount, "Insufficient amount");
 
-        uint256 gldkarmaAmount = _amount * rate;
+        uint256 gldkrmAmount = _amount * rate;
         uint256 gldkrm20Balance = gldkrm20.balanceOf(address(this));
-        require(gldkrm20Balance >= gldkarmaAmount, "Not enough GLDKRM available");
+        require(gldkrm20Balance >= gldkrmAmount, "Not enough GLDKRM available");
         
-        _stablecoinAddress.transferFrom(msg.sender, address(this), _gldkrmAmount);
-        stablecoinBalances[_stablecoinAddress] = stablecoinBalances[_stablecoinAddress] + gldkarmaAmount;
-        gldkrm20.transfer(msg.sender, gldkarmaAmount);
+        stablecoin.transferFrom(msg.sender, address(this), gldkrmAmount);
+        stablecoinBalances[_stablecoinAddress] = stablecoinBalances[_stablecoinAddress] + gldkrmAmount;
+        gldkrm20.transfer(msg.sender, gldkrmAmount);
 
-        emit Bought(msg.sender, _gldkrmAmount, gldkrm20Amount);
+        emit Bought(msg.sender, _stablecoinAddress, _amount, gldkrmAmount);
     }
 
 
-    function withdrawal(uint256 amount, ierc20 _stablecoinAddress) external onlyAdmins nonReentrant{
+    function withdrawal(uint256 amount, address _stablecoinAddress) external onlyAdmins nonReentrant{
         require(_stablecoinAddress != address(0), "Invalid address");
         require(stablecoinBalances[_stablecoinAddress] >= amount, "Insufficient amount");
+        IERC20 stablecoin = IERC20(_stablecoinAddress);
         
         stablecoinBalances[_stablecoinAddress] = stablecoinBalances[_stablecoinAddress] - amount;
-        stablecoinBalances[_stablecoinAddress].transfer(msg.sender, amount);
+        stablecoin.transfer(msg.sender, amount);
 
         emit Withdrawal(msg.sender, _stablecoinAddress, amount);
     }
 
 
-    function selfDestruct () external onlyAdmins{
-        selfdestruct(payable(msg.sender));
-    }
 }
