@@ -8,12 +8,17 @@ describe("ICO", () => {
     })
 
 
-    it("Admin Should Withdraw", () => {
+    it("Buy method should be disabled", () => {
 
     })
 
 
-    it("Admin Shouldn't Withdraw", () => {
+    it("Admin should Withdraw", () => {
+
+    })
+
+
+    it("Not admin shouldn't Withdraw", () => {
 
     })
 
