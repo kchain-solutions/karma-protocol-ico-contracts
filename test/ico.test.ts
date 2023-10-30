@@ -53,17 +53,49 @@ describe("ICO", () => {
             .withArgs(user.address, usdcAddress, BigInt(stableAmount), BigInt(stableAmount * RATE))
 
         expect(await gldkrmContract.balanceOf(user.address)).to.be.equals(BigInt(stableAmount * RATE))
+        expect(await icoContract.stablecoinBalances(await usdc.getAddress())).to.be.equals(stableAmount)
         expect(await usdc.balanceOf(user.address)).to.be.equals(BigInt(USER_STABLECOIN_INIT_BALANCE - stableAmount))
     })
 
 
-    it("Buy method should be disabled", () => {
+    it("Buy method should be disabled", async () => {
+        const { admin1, icoContract, user, usdc } = await loadFixture(deployFixture)
 
+        await icoContract.connect(admin1).setIsActivated(false)
+        await expect(icoContract.connect(user).buy(100, await usdc.getAddress())).to.be.revertedWith('Method is not active')
     })
 
 
-    it("Admin should Withdraw", () => {
+    it("Admin should Withdraw", async () => {
+        const { admin1, icoContract, user, usdc } = await loadFixture(deployFixture)
 
+        const stableAmount = 100
+        await usdc.connect(user).approve(await icoContract.getAddress(), stableAmount)
+        await icoContract.connect(user).buy(stableAmount, await usdc.getAddress())
+        expect(await icoContract.stablecoinBalances(await usdc.getAddress())).to.be.equals(stableAmount)
+
+        await expect(icoContract.connect(admin1).withdrawal(stableAmount + 1, await usdc.getAddress()))
+            .to.be.revertedWith('Insufficient amount')
+        expect(await icoContract.connect(admin1).withdrawal(stableAmount, await usdc.getAddress()))
+
+
+        expect(await usdc.balanceOf(admin1)).to.be.equals(stableAmount)
+        expect(await icoContract.stablecoinBalances(await usdc.getAddress())).to.be.equals(0)
+    })
+
+
+    it("Withdrawal should emit event", async () => {
+        const { admin1, icoContract, user, usdc } = await loadFixture(deployFixture)
+
+        const stableAmount = 100
+        await usdc.connect(user).approve(await icoContract.getAddress(), stableAmount)
+        await icoContract.connect(user).buy(stableAmount, await usdc.getAddress())
+
+        const usdcAddress = await usdc.getAddress()
+
+        await expect(icoContract.connect(admin1).withdrawal(stableAmount, usdcAddress))
+            .to.emit(icoContract, 'Withdrawal')
+            .withArgs(admin1.address, usdcAddress, stableAmount)
     })
 
 

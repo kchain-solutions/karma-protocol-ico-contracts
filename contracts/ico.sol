@@ -112,22 +112,22 @@ contract ICO is ReentrancyGuard {
         require(gldkrm20Balance >= gldkrmAmount, "Not enough GLDKRM available");
         
         stablecoin.transferFrom(msg.sender, address(this), _amount);
-        stablecoinBalances[_stablecoinAddress] = stablecoinBalances[_stablecoinAddress] + gldkrmAmount;
+        stablecoinBalances[_stablecoinAddress] = stablecoinBalances[_stablecoinAddress] + _amount;
         gldkrm20.transfer(msg.sender, gldkrmAmount);
 
         emit Bought(msg.sender, _stablecoinAddress, _amount, gldkrmAmount);
     }
 
 
-    function withdrawal(uint256 amount, address _stablecoinAddress) external onlyAdmins nonReentrant{
+    function withdrawal(uint256 _amount, address _stablecoinAddress) external onlyAdmins nonReentrant{
         require(_stablecoinAddress != address(0), "Invalid address");
-        require(stablecoinBalances[_stablecoinAddress] >= amount, "Insufficient amount");
+        require(stablecoinBalances[_stablecoinAddress] >= _amount, "Insufficient amount");
         IERC20 stablecoin = IERC20(_stablecoinAddress);
         
-        stablecoinBalances[_stablecoinAddress] = stablecoinBalances[_stablecoinAddress] - amount;
-        stablecoin.transfer(msg.sender, amount);
+        stablecoinBalances[_stablecoinAddress] = stablecoinBalances[_stablecoinAddress] - _amount;
+        stablecoin.transfer(msg.sender, _amount);
 
-        emit Withdrawal(msg.sender, _stablecoinAddress, amount);
+        emit Withdrawal(msg.sender, _stablecoinAddress, _amount);
     }
 
 
