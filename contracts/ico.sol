@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 
-contract InvestorVault is ReentrancyGuard {
+contract ICO is ReentrancyGuard {
     
 
     /**
@@ -29,20 +29,17 @@ contract InvestorVault is ReentrancyGuard {
     /**
      * STATE VARIABLES
      */
-    mapping(address => bool) admins;
-    mapping(address => bool) authorizedStablecoins;
-    mapping(address => uint256) stablecoinBalances;
+    mapping(address => bool) public admins;
+    mapping(address => bool) public authorizedStablecoins;
+    mapping(address => uint256) public stablecoinBalances;
     IERC20 public gldkrm20;
-    uint256 public rate = 12; // Conversion rate for buying gldkrm20 with Stablecoin
-    bool isActive;
+    uint256 public rate; // Conversion rate for buying gldkrm20 with Stablecoin
+    bool public isActive;
+    bool private isgldkrmAddressUpdated = false;
     
 
-    constructor(
-        IERC20 _gldkrm20,
-        uint256 _rate
-    ) {
+    constructor(uint256 _rate) {
         require(_rate > 0, "Rate must be greater than 0");
-        gldkrm20 = _gldkrm20;
         rate = _rate;
         admins[msg.sender] = true;
         isActive = true;
@@ -50,7 +47,7 @@ contract InvestorVault is ReentrancyGuard {
 
 
     /**
-     *  FUNCTIONS & MODIFIERS
+     *  SETTERS & MODIFIERS
      */
     modifier onlyAdmins() {
         require(admins[msg.sender] == true, "Not an admin");
@@ -64,19 +61,27 @@ contract InvestorVault is ReentrancyGuard {
     }
 
 
-    function addAdmin(address admin) external onlyAdmins{
-        require(admin != address(0), "Invalid address");
-        require(!admins[admin], "Already an admin");
-        admins[admin] = true;
+    function addAdmin(address _admin) external onlyAdmins{
+        require(_admin != address(0), "Invalid address");
+        require(!admins[_admin], "Already an admin");
+        admins[_admin] = true;
     }
 
 
-    function setIsActivated(bool activate) external onlyAdmins{
-        isActive = activate;
+    function setIsActivated(bool _activate) external onlyAdmins{
+        isActive = _activate;
     }
 
 
-    function addStablecoin(address _stablecoinAddress) external onlyAdmins{
+    function setGldkrmAddress(address _gldkrmAddress) external onlyAdmins{
+        require(_gldkrmAddress != address(0), "Invalid address");
+        require(isgldkrmAddressUpdated == false, "gldkrm20 can be updated only once");
+        gldkrm20 = IERC20(_gldkrmAddress);
+        isgldkrmAddressUpdated = true;
+    }
+
+
+    function authorizeStablecoin(address _stablecoinAddress) external onlyAdmins{
         require(_stablecoinAddress != address(0), "Invalid address");
         authorizedStablecoins[_stablecoinAddress] = true;
         stablecoinBalances[_stablecoinAddress] = 0;
@@ -89,7 +94,12 @@ contract InvestorVault is ReentrancyGuard {
         authorizedStablecoins[_stablecoinAddress] = false;
     }
 
+
+    /**
+     *  FUNCTIONS
+     */
     function buy(uint256 _amount, address _stablecoinAddress) public nonReentrant onlyIfActivated{
+        require(isgldkrmAddressUpdated == true, "gldkrm20 address must be setted");
         require(authorizedStablecoins[_stablecoinAddress] == true, "Stablecoin not registered");
         require(_stablecoinAddress != address(0), "Invalid address");
         IERC20 stablecoin = IERC20(_stablecoinAddress);
@@ -101,7 +111,7 @@ contract InvestorVault is ReentrancyGuard {
         uint256 gldkrm20Balance = gldkrm20.balanceOf(address(this));
         require(gldkrm20Balance >= gldkrmAmount, "Not enough GLDKRM available");
         
-        stablecoin.transferFrom(msg.sender, address(this), gldkrmAmount);
+        stablecoin.transferFrom(msg.sender, address(this), _amount);
         stablecoinBalances[_stablecoinAddress] = stablecoinBalances[_stablecoinAddress] + gldkrmAmount;
         gldkrm20.transfer(msg.sender, gldkrmAmount);
 
