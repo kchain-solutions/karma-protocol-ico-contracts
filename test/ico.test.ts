@@ -1,12 +1,12 @@
 const { expect } = require("chai")
 const { BigNumber } = require("ethers")
-const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers")
 
 
 const RATE = 12
 const ICO_SHARES = 63000000
 const PRIVATE_SHARES = 37000000
-const USER_STABLECOIN_INIT_BALANCE = 1000000
+const USER_STABLECOIN_INIT_BALANCE = 1000
 
 
 describe("ICO", () => {
@@ -99,22 +99,65 @@ describe("ICO", () => {
     })
 
 
-    it("Not admin shouldn't Withdraw", () => {
+    it("Not admin shouldn't Withdraw", async () => {
+        const { icoContract, user, usdc } = await loadFixture(deployFixture)
+
+        const stableAmount = 100
+        await usdc.connect(user).approve(await icoContract.getAddress(), stableAmount)
+        await icoContract.connect(user).buy(stableAmount, await usdc.getAddress())
+
+        const usdcAddress = await usdc.getAddress()
+
+        await expect(icoContract.connect(user).withdrawal(stableAmount, usdcAddress)).to.be.revertedWith('Not an admin')
+    })
+
+
+    it("Should add admin", async () => {
+        const { admin1, admin2, icoContract, user } = await loadFixture(deployFixture)
+        expect(await icoContract.admins(await admin2.getAddress())).to.be.equals(false)
+        await icoContract.connect(admin1).addAdmin(await admin2.getAddress())
+        expect(await icoContract.admins(await admin2.getAddress())).to.be.equals(true)
+        await expect(icoContract.connect(user).addAdmin(await user.getAddress())).to.be.revertedWith('Not an admin')
 
     })
 
 
-    it("Should add admin", () => {
+    it("Should revert insufficient stablecoin amount", async () => {
+        const { user, icoContract, gldkrmContract, usdc } = await loadFixture(deployFixture)
+        const stableAmount = 1001
 
+        const usdcAddress = await usdc.getAddress()
+        const icoContractAddress = await icoContract.getAddress()
+        await usdc.connect(user).approve(icoContractAddress, stableAmount)
+
+        await expect(icoContract.connect(user).buy(stableAmount, usdcAddress))
+            .to.be.revertedWith('Insufficient amount')
     })
 
 
-    it("Should remove admin", () => {
+    it("Should revert insufficient gldkrm coin amount", async () => {
+        const { user, icoContract, gldkrmContract, usdc } = await loadFixture(deployFixture)
+        const stableAmount = 1000000000
 
+        await usdc.mint(await user.getAddress(), stableAmount)
+
+        const usdcAddress = await usdc.getAddress()
+        const icoContractAddress = await icoContract.getAddress()
+        await usdc.connect(user).approve(icoContractAddress, stableAmount)
+
+        await expect(icoContract.connect(user).buy(stableAmount, usdcAddress))
+            .to.be.revertedWith('Not enough GLDKRM available')
     })
 
 
-    it("Should revert insufficient amount", () => {
+    it("Should remove stablecoin", async () => {
+        const { admin1, user, icoContract, gldkrmContract, usdc } = await loadFixture(deployFixture)
+
+        const usdcAddress = await usdc.getAddress()
+        await icoContract.connect(admin1).removeStablecoin(usdcAddress)
+        expect(await icoContract.authorizedStablecoins(usdcAddress)).to.be.equals(false)
+
+        await expect(icoContract.connect(user).authorizeStablecoin(usdcAddress)).to.be.revertedWith('Not an admin')
 
     })
 })
