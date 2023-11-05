@@ -37,3 +37,31 @@ Keep an eye on our GitHub repository and official channels for announcements rel
 ## Contribute
 
 Want to contribute? Great! We're open to collaborations and look forward to seeing what the community can bring to this ambitious project.
+
+## Official deploy addresses
+### Testnet
+```txt
+Deploying USDT contract with the account: 0xdA813650a15b78340468A2Ecb6A40f122ebD62cb
+Contract USDT deployed to 0x34b4C111078B358d175D42D4B075Dd9E3a8Bb2Ea on testnet 
+
+Deploying USDC contract with the account: 0xdA813650a15b78340468A2Ecb6A40f122ebD62cb
+Contract USDC deployed to 0x64AAC408993Fd4092b7DdF0Ca204c475618Ecc8e on testnet 
+
+Deploying ICO contract with the account: 0xdA813650a15b78340468A2Ecb6A40f122ebD62cb
+
+Waiting for 6 confirmations...
+Contract ICO deployed to 0x8e5A91f9e981ddfa51f10600857a6F5cE49fC6E4 on testnet. Block number 4635694 
+The contract 0x8e5A91f9e981ddfa51f10600857a6F5cE49fC6E4 has already been verified.
+https://sepolia.etherscan.io/address/0x8e5A91f9e981ddfa51f10600857a6F5cE49fC6E4#code
+
+
+
+Deploying GLDKRM contract with the account: 0xdA813650a15b78340468A2Ecb6A40f122ebD62cb
+
+Waiting for 6 confirmations...
+Contract GLDKM deployed to 0xf92735696823056fbF96E1EE58a0666c06AC27EF on testnet. Block number 4635700
+The contract 0xf92735696823056fbF96E1EE58a0666c06AC27EF has already been verified.
+https://sepolia.etherscan.io/address/0xf92735696823056fbF96E1EE58a0666c06AC27EF#code
+```
+
+### Mainnet
