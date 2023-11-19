@@ -7,7 +7,7 @@ This repository serves as the foundation for the initial phase of the EarnKarma 
 
 ## GLDKRM: The Equity Token
 
-GLDKRM is the designated equity token for EarnKarma and is pivotal in ensuring the project's self-sustainability. By acquiring GLDKRM tokens, you are not only contributing to the development of the protocol but also becoming a part of a project collecting future dividends from staking your tokens.
+GLDKRM is the designated equity token for EarnKarma and is pivotal in ensuring the project's self-sustainability. By acquiring GLDKRM tokens, you are not only contributing to the development of the protocol but also becoming a part of the DAO collecting future dividends from staking your tokens.
 
 ## Funding & Token Allocation
 
@@ -17,7 +17,7 @@ Our immediate aim is to secure a funding of $2.1 million, which will facilitate 
 
 ### Token Sale
 
-To achieve this funding goal, we plan to sell 63% of the GLDKRM token supply. This will be conducted through a public sale, details of which will be announced soon.
+To achieve this funding goal, we plan to sell 65% of the GLDKRM token supply. This will be conducted through a public sale, details of which will be announced soon.
 
 ### Remaining Allocation
 
@@ -32,7 +32,8 @@ To achieve this funding goal, we plan to sell 63% of the GLDKRM token supply. Th
 Keep an eye on our GitHub repository and official channels for announcements related to the token sale, updates on development milestones, and opportunities for community involvement.
 
 - [Earnkarma website](https://www.earnkarma.io)
-- [Earnkarma whitepaper]([https://](https://kchainsolutions.medium.com/karma-protocol-whitepaper-96dcbd4a9cfb))
+- [Earnkarma whitepaper](https://kchainsolutions.medium.com/karma-protocol-whitepaper-96dcbd4a9cfb)
+- [KChain Solutions](https://kchain.solutions)
 
 ## Contribute
 
@@ -65,3 +66,4 @@ https://sepolia.etherscan.io/address/0xf92735696823056fbF96E1EE58a0666c06AC27EF#
 ```
 
 ### Mainnet
+[TBD]
