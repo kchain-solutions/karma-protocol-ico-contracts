@@ -5,8 +5,8 @@ const hre = require("hardhat")
 async function main() {
     const WAIT_BLOCK_CONFIRMATIONS = 6
     const RATE = 30
-    const ICO_POOL_SHARES = BigInt(63000000) * BigInt(10 ** 18)
-    const PRIVATE_SHARES = BigInt(37000000) * BigInt(10 ** 18)
+    const ICO_POOL_SHARES = BigInt(65000000) * BigInt(10 ** 18)
+    const PRIVATE_SHARES = BigInt(35000000) * BigInt(10 ** 18)
 
     /**
      * Deploying ICO contract
