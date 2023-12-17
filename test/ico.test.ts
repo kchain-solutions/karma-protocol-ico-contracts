@@ -4,8 +4,8 @@ const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helper
 
 
 const RATE = 12
-const ICO_SHARES = 63000000
-const PRIVATE_SHARES = 37000000
+const ICO_SHARES = BigInt(63000000) * BigInt(10 ** 18)
+const PRIVATE_SHARES = BigInt(37000000) * BigInt(10 ** 18)
 const USER_STABLECOIN_INIT_BALANCE = 1000
 
 
@@ -50,9 +50,8 @@ describe("ICO", () => {
 
         await expect(icoContract.connect(user).buy(stableAmount, usdcAddress))
             .to.emit(icoContract, 'Bought')
-            .withArgs(user.address, usdcAddress, BigInt(stableAmount), BigInt(stableAmount * RATE))
-
-        expect(await gldkrmContract.balanceOf(user.address)).to.be.equals(BigInt(stableAmount * RATE))
+            .withArgs(user.address, usdcAddress, BigInt(stableAmount), BigInt(stableAmount * RATE * 10 ** 12))
+        expect(await gldkrmContract.balanceOf(user.address)).to.be.equals(BigInt(stableAmount * RATE * 10 ** 12))
         expect(await icoContract.stablecoinBalances(await usdc.getAddress())).to.be.equals(stableAmount)
         expect(await usdc.balanceOf(user.address)).to.be.equals(BigInt(USER_STABLECOIN_INIT_BALANCE - stableAmount))
     })
@@ -124,7 +123,7 @@ describe("ICO", () => {
 
     it("Should revert insufficient stablecoin amount", async () => {
         const { user, icoContract, gldkrmContract, usdc } = await loadFixture(deployFixture)
-        const stableAmount = 1001
+        const stableAmount = BigInt('10000000000000000') * BigInt(10 ** 18)
 
         const usdcAddress = await usdc.getAddress()
         const icoContractAddress = await icoContract.getAddress()
@@ -137,7 +136,7 @@ describe("ICO", () => {
 
     it("Should revert insufficient gldkrm coin amount", async () => {
         const { user, icoContract, gldkrmContract, usdc } = await loadFixture(deployFixture)
-        const stableAmount = 1000000000
+        const stableAmount = BigInt('10000000000000000') * BigInt(10 ** 18)
 
         await usdc.mint(await user.getAddress(), stableAmount)
 
@@ -158,6 +157,12 @@ describe("ICO", () => {
         expect(await icoContract.authorizedStablecoins(usdcAddress)).to.be.equals(false)
 
         await expect(icoContract.connect(user).authorizeStablecoin(usdcAddress)).to.be.revertedWith('Not an admin')
+    })
 
+
+    it("Should withdraw GLDKRM", async () => {
+        const { admin1, icoContract, gldkrmContract } = await loadFixture(deployFixture)
+        await icoContract.connect(admin1).gldkarmaWithdrawal()
+        expect(await gldkrmContract.balanceOf(admin1.address)).to.be.equals((BigInt(37000000) * BigInt(10 ** 18)) + (BigInt(63000000) * BigInt(10 ** 18)))
     })
 })

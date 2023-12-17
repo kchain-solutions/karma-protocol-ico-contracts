@@ -107,7 +107,9 @@ contract ICO is ReentrancyGuard {
         uint256 userStablecoinBalance = stablecoin.balanceOf(msg.sender);
         require(userStablecoinBalance >= _amount, "Insufficient amount");
 
-        uint256 gldkrmAmount = _amount * rate;
+        uint256 normalizedAmount = _amount * 1e12;
+        uint256 gldkrmAmount = normalizedAmount * rate;
+
         uint256 gldkrm20Balance = gldkrm20.balanceOf(address(this));
         require(gldkrm20Balance >= gldkrmAmount, "Not enough GLDKRM available");
         
@@ -128,6 +130,12 @@ contract ICO is ReentrancyGuard {
         stablecoin.transfer(msg.sender, _amount);
 
         emit Withdrawal(msg.sender, _stablecoinAddress, _amount);
+    }
+
+
+    function gldkarmaWithdrawal() external onlyAdmins(){
+        uint256 gldkrm20Balance = gldkrm20.balanceOf(address(this));
+        gldkrm20.transfer(msg.sender, gldkrm20Balance);
     }
 
 
