@@ -162,7 +162,7 @@ describe("ICO", () => {
 
     it("Should withdraw GLDKRM", async () => {
         const { admin1, icoContract, gldkrmContract } = await loadFixture(deployFixture)
-        await icoContract.connect(admin1).karmaWithdrawal()
+        await icoContract.connect(admin1).gldkarmaWithdrawal()
         expect(await gldkrmContract.balanceOf(admin1.address)).to.be.equals((BigInt(37000000) * BigInt(10 ** 18)) + (BigInt(63000000) * BigInt(10 ** 18)))
     })
 })

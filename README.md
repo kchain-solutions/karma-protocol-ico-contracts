@@ -66,4 +66,23 @@ https://sepolia.etherscan.io/address/0xf92735696823056fbF96E1EE58a0666c06AC27EF#
 ```
 
 ### Mainnet
-[TBD]
+
+USDC 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+
+Waiting for 6 confirmations...
+Contract ICO deployed to 0xE5078921B1CE2000Ef8eAd372eA64f94b45B33cB on prod. Block number 18804477 
+Successfully submitted source code for contract
+contracts/ico.sol:ICO at 0xE5078921B1CE2000Ef8eAd372eA64f94b45B33cB
+for verification on the block explorer. Waiting for verification result...
+
+Successfully verified contract ICO on the block explorer.
+https://etherscan.io/address/0xE5078921B1CE2000Ef8eAd372eA64f94b45B33cB#code
+
+
+
+Deploying GLDKRM contract with the account: 0x2d90cBA974b13AD4EBa99FC4B580185F55d087DF
+
+Waiting for 6 confirmations...
+Contract GLDKM deployed to 0xAa3E53d479F9D45A4A807c5E21A550a5FC06b804 on prod. Block number 18804484
+The contract 0xAa3E53d479F9D45A4A807c5E21A550a5FC06b804 has already been verified.
+https://etherscan.io/address/0xAa3E53d479F9D45A4A807c5E21A550a5FC06b804#code
