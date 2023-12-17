@@ -157,6 +157,12 @@ describe("ICO", () => {
         expect(await icoContract.authorizedStablecoins(usdcAddress)).to.be.equals(false)
 
         await expect(icoContract.connect(user).authorizeStablecoin(usdcAddress)).to.be.revertedWith('Not an admin')
+    })
 
+
+    it("Should withdraw GLDKRM", async () => {
+        const { admin1, icoContract, gldkrmContract } = await loadFixture(deployFixture)
+        await icoContract.connect(admin1).karmaWithdrawal()
+        expect(await gldkrmContract.balanceOf(admin1.address)).to.be.equals((BigInt(37000000) * BigInt(10 ** 18)) + (BigInt(63000000) * BigInt(10 ** 18)))
     })
 })

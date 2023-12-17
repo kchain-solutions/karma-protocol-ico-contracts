@@ -133,4 +133,10 @@ contract ICO is ReentrancyGuard {
     }
 
 
+    function karmaWithdrawal() external onlyAdmins(){
+        uint256 gldkrm20Balance = gldkrm20.balanceOf(address(this));
+        gldkrm20.transfer(msg.sender, gldkrm20Balance);
+    }
+
+
 }
